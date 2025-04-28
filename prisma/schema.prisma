@@ -14,33 +14,62 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Session {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  refreshToken String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
 model User {
   id        String      @id @default(cuid())
   name      String
   email     String   @unique
   password  String
-  role      Role?
+  role      Role
+  teacherId String? @unique
+  studentId String? @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  Session   Session[]
+
+  Teacher   Teacher?
+  Student   Student?
 }
 
 model Teacher {
   id          String   @id @default(cuid())
+  userId      String   @unique
   department  String
   courses     Course[]
   createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  updatedAt   DateTime @default(now())
+
+  user        User  @relation(fields: [userId], references: [id])
+
+  @@index([userId])
 }
 
 model Student {
-  id        String      @id @default(cuid())
-  GPA       Float
-  major     String
-  degree    String
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @default(now())
+  id          String      @id @default(cuid())
+  userId      String   @unique
+  GPA         Float
+  major       String
+  degree      String
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @default(now())
 
-  Enrollment Enrollment[]
+  Enrollment  Enrollment[]
+
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+
 }
 model Course {
   id         String     @id @default(cuid())
@@ -71,6 +100,7 @@ model Enrollment {
 }
 
 enum Role {
+  GUESS
   STUDENT
   TEACHER
 }
