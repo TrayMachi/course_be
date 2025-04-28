@@ -100,7 +100,7 @@ model Enrollment {
 }
 
 enum Role {
-  GUESS
+  GUEST
   STUDENT
   TEACHER
 }

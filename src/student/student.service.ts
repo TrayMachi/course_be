@@ -38,6 +38,16 @@ export class StudentService {
   async getStudentById(id: string) {
     const student = await this.prisma.student.findUnique({
       where: { id },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            role: true,
+          },
+        },
+      },
     });
 
     if (!student) {
@@ -80,6 +90,10 @@ export class StudentService {
   async deleteStudent(id: string) {
     const student = await this.prisma.student.findUnique({ where: { id } });
     if (!student) throw new NotFoundException('Student not found');
+    await this.prisma.user.update({
+      where: { id: student.userId },
+      data: { role: 'GUEST' },
+    });
     return this.prisma.student.delete({ where: { id } });
   }
 }

@@ -64,7 +64,7 @@ export class AuthService {
         email: data.email,
         password: hashedPassword,
         name: data.name,
-        role: 'GUESS',
+        role: 'GUEST',
       },
     });
 
