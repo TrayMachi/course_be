@@ -9,7 +9,7 @@ export const RegisterTeacherSchema = z.object({
 export class RegisterTeacherDto extends createZodDto(RegisterTeacherSchema) {}
 
 export const UpdateTeacherSchema = z.object({
-  department: z.string().nonempty('Department is required'),
+  department: z.string().optional(),
 });
 
 export class UpdateTeacherDto extends createZodDto(UpdateTeacherSchema) {}

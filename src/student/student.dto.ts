@@ -17,9 +17,9 @@ export const UpdateStudentSchema = z.object({
   GPA: z
     .number()
     .min(0, 'GPA must be between 0 and 4')
-    .max(4, 'GPA must be between 0 and 4'),
-  major: z.string().nonempty('Major is required'),
-  degree: z.string().nonempty('Degree is required'),
+    .max(4, 'GPA must be between 0 and 4').optional(),
+  major: z.string().optional(),
+  degree: z.string().optional(),
 });
 
 export class UpdateStudentDto extends createZodDto(UpdateStudentSchema) {}
