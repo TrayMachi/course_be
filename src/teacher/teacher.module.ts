@@ -1,12 +1,13 @@
 import { Module } from '@nestjs/common';
 import { TeacherService } from './teacher.service';
 import { TeacherController } from './teacher.controller';
-import { AccessTokenGuard } from 'src/auth/auth.guard';
 import { PrismaModule } from 'src/prisma/prisma.module';
+import { JwtService } from '@nestjs/jwt';
+import { ResponseUtil } from 'src/common/utils/response.util';
 
 @Module({
-  imports: [PrismaModule, AccessTokenGuard],
+  imports: [PrismaModule],
   controllers: [TeacherController],
-  providers: [TeacherService],
+  providers: [TeacherService, JwtService, ResponseUtil],
 })
 export class TeacherModule {}

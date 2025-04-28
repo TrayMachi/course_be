@@ -13,6 +13,5 @@ import { AccessTokenGuard, RefreshTokenGuard } from './auth.guard';
   ],
   controllers: [AuthController],
   providers: [AuthService, ResponseUtil, RefreshTokenGuard],
-  exports: [RefreshTokenGuard, AccessTokenGuard],
 })
 export class AuthModule {}

@@ -1,12 +1,13 @@
 import { Module } from '@nestjs/common';
 import { CourseService } from './course.service';
 import { CourseController } from './course.controller';
-import { AccessTokenGuard } from 'src/auth/auth.guard';
 import { PrismaModule } from 'src/prisma/prisma.module';
+import { JwtService } from '@nestjs/jwt';
+import { ResponseUtil } from 'src/common/utils/response.util';
 
 @Module({
-  imports: [PrismaModule, AccessTokenGuard],
+  imports: [PrismaModule],
   controllers: [CourseController],
-  providers: [CourseService],
+  providers: [CourseService, JwtService, ResponseUtil],
 })
 export class CourseModule {}

@@ -17,28 +17,18 @@ export class AuthService {
   ) {}
 
   async generateTokens(userId: string, name: string, role: string) {
-    const accessToken = this.jwtService.sign(
-      {
-        fullname: name,
-        sub: userId,
-        permission: role,
-        iat: Math.floor(Date.now() / 1000),
-        exp: Math.floor(Date.now() / 1000) + 60 * 60 * 3,
-      },
-      {
-        expiresIn: '3h',
-      },
-    );
-    const refreshToken = this.jwtService.sign(
-      {
-        sub: userId,
-        iat: Math.floor(Date.now() / 1000),
-        exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7,
-      },
-      {
-        expiresIn: '7d',
-      },
-    );
+    const accessToken = this.jwtService.sign({
+      fullname: name,
+      sub: userId,
+      permission: role,
+      iat: Math.floor(Date.now() / 1000),
+      exp: Math.floor(Date.now() / 1000) + 60 * 60 * 3,
+    });
+    const refreshToken = this.jwtService.sign({
+      sub: userId,
+      iat: Math.floor(Date.now() / 1000),
+      exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7,
+    });
     return { accessToken, refreshToken };
   }
 
@@ -80,13 +70,17 @@ export class AuthService {
       throw new NotFoundException('User not found');
     }
 
-    const valid = await verify(data.password, user.password);
+    const valid = await verify(user.password, data.password);
 
     if (!valid) {
       throw new UnauthorizedException('Invalid password');
     }
 
-    const tokens = await this.generateTokens(user.id, user.name, user.role.toUpperCase());
+    const tokens = await this.generateTokens(
+      user.id,
+      user.name,
+      user.role.toUpperCase(),
+    );
 
     await this.prisma.session.create({
       data: {
