@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { RegisterStudentDto, UpdateStudentDto } from './student.dto';
 
@@ -47,6 +47,17 @@ export class StudentService {
             role: true,
           },
         },
+        Enrollment: {
+          select: {
+            course: {
+              select: {
+                id: true,
+                name: true,
+                code: true,
+              },
+            },
+          },
+        },
       },
     });
 
@@ -86,7 +97,7 @@ export class StudentService {
     }
 
     if (student.userId !== userId) {
-      throw new NotFoundException(
+      throw new UnauthorizedException(
         'You are not authorized to update this student',
       );
     }
@@ -109,11 +120,11 @@ export class StudentService {
     }
 
     if (student.userId !== userId) {
-      throw new NotFoundException(
+      throw new UnauthorizedException(
         'You are not authorized to delete this student',
       );
     }
-    
+
     await this.prisma.user.update({
       where: { id: student.userId },
       data: { role: 'GUEST' },

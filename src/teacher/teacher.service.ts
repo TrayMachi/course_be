@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { RegisterTeacherDto, UpdateTeacherDto } from './teacher.dto';
 
@@ -18,6 +18,7 @@ export class TeacherService {
             role: true,
           },
         },
+        courses: true,
       },
     });
 
@@ -56,7 +57,9 @@ export class TeacherService {
   }
 
   async registerTeacher(data: RegisterTeacherDto) {
-    const user = await this.prisma.user.findUnique({ where: { id: data.userId } });
+    const user = await this.prisma.user.findUnique({
+      where: { id: data.userId },
+    });
     if (!user) throw new NotFoundException('User not found');
 
     await this.prisma.user.update({
@@ -75,9 +78,19 @@ export class TeacherService {
     });
   }
 
-  async updateTeacher(id: string, data: UpdateTeacherDto) {
+  async updateTeacher(id: string, data: UpdateTeacherDto, userId: string) {
     const teacher = await this.prisma.teacher.findUnique({ where: { id } });
-    if (!teacher) throw new NotFoundException('Teacher not found');
+
+    if (!teacher) {
+      throw new NotFoundException('Teacher not found');
+    }
+
+    if (teacher.userId !== userId) {
+      throw new UnauthorizedException(
+        'You are not authorized to update this teacher',
+      );
+    }
+
     return this.prisma.teacher.update({
       where: { id },
       data,
@@ -85,10 +98,23 @@ export class TeacherService {
     });
   }
 
-  async deleteTeacher(id: string) {
+  async deleteTeacher(id: string, userId: string) {
     const teacher = await this.prisma.teacher.findUnique({ where: { id } });
-    if (!teacher) throw new NotFoundException('Teacher not found');
-    await this.prisma.user.update({ where: { id: teacher.userId }, data: { role: 'GUEST' } });
+
+    if (!teacher) {
+      throw new NotFoundException('Teacher not found');
+    }
+
+    if (teacher.userId !== userId) {
+      throw new UnauthorizedException(
+        'You are not authorized to delete this teacher',
+      );
+    }
+
+    await this.prisma.user.update({
+      where: { id: teacher.userId },
+      data: { role: 'GUEST' },
+    });
     return this.prisma.teacher.delete({ where: { id } });
   }
 }

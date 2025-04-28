@@ -43,12 +43,6 @@ export class TeacherController {
 
   @Get(':id')
   async getById(@Param('id') id: string, @Req() req) {
-    if (req.user.role !== 'TEACHER') {
-      return this.responseUtil.response({
-        code: HttpStatus.FORBIDDEN,
-        message: 'Only TEACHER users request',
-      });
-    }
     const teacher = await this.teacherService.getTeacherById(id);
     return this.responseUtil.response(
       {
@@ -83,7 +77,7 @@ export class TeacherController {
         message: 'Only TEACHER users request',
       });
     }
-    const teacher = await this.teacherService.updateTeacher(id, body);
+    const teacher = await this.teacherService.updateTeacher(id, body, req.user.id);
     return this.responseUtil.response(
       {
         code: HttpStatus.OK,
@@ -101,7 +95,7 @@ export class TeacherController {
         message: 'Only TEACHER users request',
       });
     }
-    await this.teacherService.deleteTeacher(id);
+    await this.teacherService.deleteTeacher(id, req.user.id);
     return this.responseUtil.response({
       code: HttpStatus.OK,
       message: 'Teacher deleted successfully',

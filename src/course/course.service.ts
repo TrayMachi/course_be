@@ -2,6 +2,7 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateCourseDto, UpdateCourseDto } from './course.dto';
@@ -80,7 +81,7 @@ export class CourseService {
     const teacher = await this.prisma.teacher.findUnique({
       where: { id: data.teacherId },
     });
-    
+
     if (!teacher) {
       throw new NotFoundException('Teacher not found');
     }
@@ -116,7 +117,7 @@ export class CourseService {
     }
 
     if (course.teacher.user.id !== userId) {
-      throw new ForbiddenException(
+      throw new UnauthorizedException(
         'You are not authorized to update this course',
       );
     }
@@ -154,7 +155,7 @@ export class CourseService {
     }
 
     if (course.teacher.user.id !== id) {
-      throw new ForbiddenException(
+      throw new UnauthorizedException(
         'You are not authorized to delete this course',
       );
     }
