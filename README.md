@@ -27,3 +27,10 @@ A simple backend system for managing users (students, teachers), courses, and en
 - **Password Security**: Argon2
 
 ---
+
+## 🎈 Deployment & Documentation
+
+- [Apidog Collection](https://o3lejtvb45.apidog.io/delete-16352058e0) for API document
+- [Deployment URL](https://course-be.fly.dev/) (Fly.io)
+
+---
