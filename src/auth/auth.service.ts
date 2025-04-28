@@ -86,7 +86,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid password');
     }
 
-    const tokens = await this.generateTokens(user.id, user.name, user.role);
+    const tokens = await this.generateTokens(user.id, user.name, user.role.toUpperCase());
 
     await this.prisma.session.create({
       data: {
@@ -129,7 +129,7 @@ export class AuthService {
     const tokens = await this.generateTokens(
       userId,
       session.user.name,
-      session.user.role,
+      session.user.role.toUpperCase(),
     );
 
     return {
