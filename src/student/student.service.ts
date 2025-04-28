@@ -78,18 +78,42 @@ export class StudentService {
     });
   }
 
-  async updateStudent(id: string, data: UpdateStudentDto) {
+  async updateStudent(id: string, data: UpdateStudentDto, userId: string) {
     const student = await this.prisma.student.findUnique({ where: { id } });
-    if (!student) throw new NotFoundException('Student not found');
+
+    if (!student) {
+      throw new NotFoundException('Student not found');
+    }
+
+    if (student.userId !== userId) {
+      throw new NotFoundException(
+        'You are not authorized to update this student',
+      );
+    }
+
     return this.prisma.student.update({
       where: { id },
-      data,
+      data: {
+        GPA: data.GPA ? data.GPA : student.GPA,
+        major: data.major ? data.major : student.major,
+        degree: data.degree ? data.degree : student.degree,
+      },
     });
   }
 
-  async deleteStudent(id: string) {
+  async deleteStudent(id: string, userId: string) {
     const student = await this.prisma.student.findUnique({ where: { id } });
-    if (!student) throw new NotFoundException('Student not found');
+
+    if (!student) {
+      throw new NotFoundException('Student not found');
+    }
+
+    if (student.userId !== userId) {
+      throw new NotFoundException(
+        'You are not authorized to delete this student',
+      );
+    }
+    
     await this.prisma.user.update({
       where: { id: student.userId },
       data: { role: 'GUEST' },

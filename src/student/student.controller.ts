@@ -43,12 +43,6 @@ export class StudentController {
 
   @Get(':id')
   async getById(@Param('id') id: string, @Req() req) {
-    if (req.user.role !== 'STUDENT') {
-      return this.responseUtil.response({
-        code: HttpStatus.FORBIDDEN,
-        message: 'Only STUDENT users request',
-      });
-    }
     const student = await this.studentService.getStudentById(id);
     return this.responseUtil.response(
       {
@@ -83,7 +77,11 @@ export class StudentController {
         message: 'Only STUDENT users request',
       });
     }
-    const student = await this.studentService.updateStudent(id, body);
+    const student = await this.studentService.updateStudent(
+      id,
+      body,
+      req.user.sub,
+    );
     return this.responseUtil.response(
       {
         code: HttpStatus.OK,
@@ -94,14 +92,14 @@ export class StudentController {
   }
 
   @Delete('delete/:id')
-  async delete(@Param('id') id: string, @Req() req,) {
+  async delete(@Param('id') id: string, @Req() req) {
     if (req.user.role !== 'STUDENT') {
       return this.responseUtil.response({
         code: HttpStatus.FORBIDDEN,
         message: 'Only STUDENT users request',
       });
     }
-    await this.studentService.deleteStudent(id);
+    await this.studentService.deleteStudent(id, req.user.sub);
     return this.responseUtil.response({
       code: HttpStatus.OK,
       message: 'Student deleted successfully',
